@@ -1,0 +1,72 @@
+.relative {
+    position: relative;
+}
+
+.underline-custom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: red;
+    transform: scaleX(1);
+    transform-origin: bottom right;
+    transition: transform 0.3s ease;
+}
+
+.relative:hover .underline-custom,
+.relative:active .underline-custom {
+    transform: scaleX(0.3);
+}
+
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.active\:w-1\/2:active {
+    width: 50%;
+    /* Adjust the width to your desired shrinking amount */
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in-up-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
