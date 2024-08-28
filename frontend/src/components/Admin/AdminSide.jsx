@@ -4,10 +4,14 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useStateContext } from "../../context/ContextProvider";
 
 const AdminSide = () => {
-  const { User } = useStateContext();
+  const { User, token } = useStateContext();
   const [loading, setLoading] = useState(true); // Loading state
   const nav = useNavigate();
-
+  useEffect(() => {
+    if (!token) {
+      nav("/login");
+    }
+  }, []);
   useEffect(() => {
     if (User.type) {
       setLoading(false); // Data is loaded

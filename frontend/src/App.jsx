@@ -18,6 +18,11 @@ import ManageOrders from "./components/Admin/ManageOrders";
 import { useStateContext } from "./context/ContextProvider";
 import Map from "./components/Map";
 import Checkout from "./components/Checkout";
+import Payment from "./components/Payment";
+import Sucess from "./Sucess";
+import EditItems from "./components/Admin/EditItems";
+import EditSingle from "./components/Admin/EditSingle";
+import SingleOrder from "./components/Admin/SingleOrder";
 function App() {
   const { token, setUser } = useStateContext();
   useEffect(() => {
@@ -40,13 +45,18 @@ function App() {
           <Route path="/map" element={<Map />} />
           <Route path="/Checkout" element={<Checkout />} />
           <Route path="/AdminMain" element={<AdminMain />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/payment-success" element={<Sucess />} />
+
           <Route path="/adminside" element={<AdminSide />}>
             <Route path="manage-items" element={<ManageItems />} />
             <Route path="manage-orders" element={<ManageOrders />} />
             <Route path="userInfo" element={<PersonalInfo />} />
             <Route path="dashboard" element={<AdminMain />} />
+            <Route path="EditItems" element={<EditItems />} />
+            <Route path="editsingleItem/:id" element={<EditSingle />} />
+            <Route path="singleorder/:id" element={<SingleOrder />} />
           </Route>
-          <Route path="/singleitem/:id" element={<SingleProduct />} />
         </Routes>
       </>
     </div>

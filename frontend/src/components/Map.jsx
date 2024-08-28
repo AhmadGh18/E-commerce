@@ -8,17 +8,25 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-
+import { useNavigate } from "react-router-dom";
+import { useStateContext } from "../context/ContextProvider";
 const center = [33.883346253230904, 35.517484664916985];
 
 const Map = () => {
+  const { token } = useStateContext();
+
   const [position, setPosition] = useState(center);
   const [displayCoords, setDisplayCoords] = useState({
     lat: center[0],
     lng: center[1],
   });
   const [city, setCity] = useState("");
-
+  const nav = useNavigate();
+  useEffect(() => {
+    if (!token) {
+      nav("/login");
+    }
+  });
   const fetchLocationInfo = async (lat, lng) => {
     try {
       const geoApiUrl = `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`;
@@ -52,7 +60,19 @@ const Map = () => {
       console.error("Geolocation is not supported by this browser");
     }
   };
-
+  function AddLocationToLocalStorage() {
+    localStorage.setItem(
+      "UserLocation",
+      JSON.stringify({
+        longitude: position[0],
+        latitude: position[1],
+        city: city,
+      })
+    );
+    if (localStorage.getItem("UserLocation")) {
+      nav("/payment");
+    }
+  }
   useEffect(() => {
     handleAcceptLocation(); // Request user location on component mount
   }, []);
@@ -102,7 +122,7 @@ const Map = () => {
         </Marker>
         <MapEvents />
       </MapContainer>
-      <div
+      {/* <div
         style={{
           position: "absolute",
           bottom: "10px",
@@ -116,9 +136,12 @@ const Map = () => {
         <p>Latitude: {displayCoords.lat}</p>
         <p>Longitude: {displayCoords.lng}</p>
         <p>City: {city}</p>
-      </div>
-      <button onClick={handleAcceptLocation} className="bg-red-200">
-        Take location
+      </div> */}
+      <button
+        onClick={AddLocationToLocalStorage}
+        className="bg-black p-3 text-white rounded-md mt-4 m-auto flex"
+      >
+        Finish paument
       </button>
     </div>
   );

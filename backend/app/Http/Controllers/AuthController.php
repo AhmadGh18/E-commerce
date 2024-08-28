@@ -66,6 +66,7 @@ class AuthController extends Controller
                 'user' => [
                     'full_name' => $user->full_name,
                     'email' => $user->email,
+                    'type'=>$user->type,
                 ],
             ]);
         } else {

@@ -4,12 +4,15 @@ import { Link, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaShoppingCart } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const SingleProduct = () => {
   const [product, setProduct] = useState({});
   const [loading, setIsLoading] = useState(true);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
   const [shoppingCarr, setShoppingCart] = useState(
     window.localStorage.getItem("CartItems")
   );
@@ -19,7 +22,18 @@ const SingleProduct = () => {
 
   const { id } = useParams();
   const scrollRef = useRef(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === product.images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
 
+  const handlePrev = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex === 0 ? product.images.length - 1 : prevIndex - 1
+    );
+  };
   useEffect(() => {
     // Fetch product data
     axiosClient
@@ -78,35 +92,23 @@ const SingleProduct = () => {
   }
 
   const handleMouseDown = (e) => {
-    if (scrollRef.current) {
-      scrollRef.current.isDown = true;
-      scrollRef.current.startX = e.pageX - scrollRef.current.offsetLeft;
-      scrollRef.current.scrollLeft = scrollRef.current.scrollLeft;
-      scrollRef.current.style.cursor = "grabbing";
-    }
+    setStartX(e.pageX - scrollRef.current.offsetLeft);
+    setScrollLeft(scrollRef.current.scrollLeft);
+    scrollRef.current.addEventListener("mousemove", handleMouseMove);
   };
 
   const handleMouseLeave = () => {
-    if (scrollRef.current) {
-      scrollRef.current.isDown = false;
-      scrollRef.current.style.cursor = "grab";
-    }
+    scrollRef.current.removeEventListener("mousemove", handleMouseMove);
   };
 
   const handleMouseUp = () => {
-    if (scrollRef.current) {
-      scrollRef.current.isDown = false;
-      scrollRef.current.style.cursor = "grab";
-    }
+    scrollRef.current.removeEventListener("mousemove", handleMouseMove);
   };
 
   const handleMouseMove = (e) => {
-    if (scrollRef.current && scrollRef.current.isDown) {
-      e.preventDefault();
-      const x = e.pageX - scrollRef.current.offsetLeft;
-      const walk = (x - scrollRef.current.startX) * 3; // Adjust the scroll speed here
-      scrollRef.current.scrollLeft = scrollRef.current.scrollLeft - walk;
-    }
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // Scroll speed
+    scrollRef.current.scrollLeft = scrollLeft - walk;
   };
 
   const handleColorClick = (color) => {
@@ -116,40 +118,64 @@ const SingleProduct = () => {
   const handleSizeClick = (size) => {
     setSelectedSize(size);
   };
-
   return (
     <div className="bg-gray-100 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row -mx-4">
           <div className="md:flex-1 px-4">
-            {/* Draggable Image Container */}
-            <div
-              ref={scrollRef}
-              onMouseDown={handleMouseDown}
-              onMouseLeave={handleMouseLeave}
-              onMouseUp={handleMouseUp}
-              onMouseMove={handleMouseMove}
-              className="h-[460px] rounded-lg bg-gray-300 mb-4 overflow-x-hidden whitespace-nowrap cursor-grab"
-            >
-              {product.images && product.images.length > 0 ? (
-                product.images.map((el, index) => (
-                  <img
-                    key={index}
-                    src={`http://localhost:8000/storage/${el.image_url}`}
-                    alt={`Product Image ${index + 1}`}
-                    className="inline-block w-[99%] h-full object-contain mr-4"
-                    draggable={false}
-                  />
-                ))
-              ) : (
-                <img
-                  src={`http://localhost:8000/storage/${product.thumbnail}`}
-                  className="inline-block w-[99%] h-full object-contain mr-4"
-                />
+            {/* Carousel Container */}
+            <div className="relative w-full h-[460px] rounded-lg overflow-hidden">
+              {/* Images */}
+              <motion.div
+                className="flex"
+                initial={{ x: 0 }}
+                animate={{ x: `-${currentIndex * 100}%` }}
+                transition={{ duration: 0.5 }}
+              >
+                {product.images && product.images.length > 0 ? (
+                  product.images.map((el, index) => (
+                    <div
+                      key={index}
+                      className="w-[100%] h-[100%] flex-shrink-0 flex items-center justify-center"
+                    >
+                      <img
+                        src={`http://localhost:8000/storage/${el.image_url}`}
+                        alt={`Product Image ${index + 1}`}
+                        className="md:h-[480px]"
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div className="w-full h-full flex-shrink-0 flex items-center justify-center">
+                    <img
+                      src={`http://localhost:8000/storage/${product.thumbnail}`}
+                      alt="Product Thumbnail"
+                      className="md:h-[480px]"
+                    />
+                  </div>
+                )}
+              </motion.div>
+              {product.images.length > 0 && (
+                <div>
+                  <button
+                    onClick={handlePrev}
+                    className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-gray-900 text-white p-3 rounded-full shadow-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
+                    aria-label="Previous Image"
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-gray-900 text-white p-3 rounded-full shadow-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-300 transition-colors"
+                    aria-label="Next Image"
+                  >
+                    &gt;
+                  </button>
+                </div>
               )}
             </div>
 
-            <div className="flex -mx-2 mb-4">
+            <div className="flex -mx-2 mb-4 mt-3">
               <div className="w-1/2 px-2">
                 <button
                   onClick={addToCart}

@@ -61,7 +61,7 @@ class OrdersController extends Controller
     }
     public function viewSingleOrder($id)
     {
-        $order = Order::with('orderedItems')->find($id);
+        $order = Order::with('user','orderedItems')->find($id);
 
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);

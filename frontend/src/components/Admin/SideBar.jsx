@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { AiFillHome } from "react-icons/ai";
-import { FaUser, FaClipboardList } from "react-icons/fa";
+import { FaUser, FaClipboardList, FaEdit } from "react-icons/fa";
 import { MdInventory } from "react-icons/md";
 
 function Sidebar() {
@@ -57,6 +57,14 @@ function Sidebar() {
                 to="/adminside/manage-orders"
               >
                 <FaClipboardList size={24} /> Manage Orders
+              </Link>
+            </li>
+            <li className="mt-5">
+              <Link
+                className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100"
+                to="/adminside/EditItems"
+              >
+                <FaEdit size={24} /> Edit items
               </Link>
             </li>
           </ul>

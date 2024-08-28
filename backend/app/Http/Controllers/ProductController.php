@@ -66,12 +66,11 @@ class ProductController extends Controller
     public function UpdateProduct(ProductRequest $req, $id)
     {
         try {
-            // Find the product by ID
+           
             $product = Product::findOrFail($id);
 
-            // Check if a new thumbnail has been uploaded
             if ($req->hasFile('thumbnail')) {
-                // Delete the old thumbnail file from storage
+                // Delete the old thumbnail file from storage if it exists
                 if ($product->thumbnail) {
                     Storage::disk('public')->delete($product->thumbnail);
                 }
@@ -81,11 +80,14 @@ class ProductController extends Controller
                 $product->thumbnail = $thumbnailPath;
             }
 
-            $product->title = $req->title;
-            $product->description = $req->description;
-            $product->category_id = $req->category_id;
-            $product->price = $req->price;
-            $product->tags = $req->tags;
+            // Update product attributes
+            $product->title = $req->input('title');
+            $product->description = $req->input('description');
+            $product->category_id = $req->input('category_id');
+            $product->price = $req->input('price');
+            $product->tags = $req->input('tags');
+            $product->gender = $req->input('gender'); // Ensure these fields are updated as needed
+            $product->age = $req->input('age');
             $product->save();
 
             // Check if new images have been uploaded
@@ -114,6 +116,7 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
     public function viewAllProducts(Request $request)
     {
         try {

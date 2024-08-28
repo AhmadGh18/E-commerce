@@ -1,55 +1,69 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useStateContext } from "../context/ContextProvider";
+import axiosClient from "../axiosClient"; // Ensure this is correctly configured
 import { useNavigate } from "react-router-dom";
+import { useStateContext } from "../context/ContextProvider";
 
 const Checkout = () => {
-  const { User, token } = useStateContext();
+  const { token } = useStateContext();
+  const [cartItems, setCartItems] = useState([]);
+  const [quantities, setQuantities] = useState({});
   const nav = useNavigate();
   useEffect(() => {
     if (!token) {
-      nav("/login");
+      nav("/");
     }
   }, []);
-  const [cartItems, setCartItems] = useState([]);
-  const [quantities, setQuantities] = useState({});
-
   useEffect(() => {
-    const storedItems = JSON.parse(localStorage.getItem("CartItems")) || [];
     const fetchProductDetails = async () => {
-      const updatedCart = await Promise.all(
-        storedItems.map(async (item) => {
-          const response = await axios.get(
-            `http://localhost:8000/api/singleitem/${item.id}`
-          );
-          return {
-            ...response.data.product,
-            color: item.color,
-            size: item.size,
-            quantity: 1,
-          };
-        })
-      );
-      setCartItems(updatedCart);
+      const storedItems = JSON.parse(localStorage.getItem("CartItems")) || [];
 
-      // Initialize quantities state with item ids, colors, and sizes and default quantity of 1
-      setQuantities(
-        updatedCart.reduce((acc, item) => {
-          const key = `${item.id}-${item.color}-${item.size}`;
-          acc[key] = 1;
-          return acc;
-        }, {})
-      );
+      try {
+        const updatedCart = await Promise.all(
+          storedItems.map(async (item) => {
+            try {
+              const response = await axiosClient.get(`/singleitem/${item.id}`);
+              return {
+                ...response.data.product,
+                color: item.color,
+                size: item.size,
+                quantity:
+                  quantities[`${item.id}-${item.color}-${item.size}`] || 1,
+              };
+            } catch (error) {
+              console.error("API Error:", error);
+              return null; // Handle error by returning null
+            }
+          })
+        );
+
+        const validCart = updatedCart.filter((item) => item !== null);
+        setCartItems(validCart);
+
+        // Initialize quantities state
+        setQuantities(
+          validCart.reduce((acc, item) => {
+            const key = `${item.id}-${item.color}-${item.size}`;
+            acc[key] = acc[key] || 1; // Ensure initial quantity is 1 if not set
+            return acc;
+          }, {})
+        );
+      } catch (error) {
+        console.error("Error fetching product details:", error);
+      }
     };
+
     fetchProductDetails();
   }, []);
 
   const handleQuantityChange = (item, delta) => {
     const key = `${item.id}-${item.color}-${item.size}`;
-    setQuantities((prevQuantities) => ({
-      ...prevQuantities,
-      [key]: Math.max(1, (prevQuantities[key] || 1) + delta),
-    }));
+    setQuantities((prevQuantities) => {
+      const newQuantity = Math.max(1, (prevQuantities[key] || 1) + delta);
+      return {
+        ...prevQuantities,
+        [key]: newQuantity,
+      };
+    });
   };
 
   const handleDelete = (item) => {
@@ -73,6 +87,23 @@ const Checkout = () => {
         cartItem.size !== item.size
     );
     localStorage.setItem("CartItems", JSON.stringify(updatedLocalStorage));
+  };
+  const handleClick = () => {
+    // Combine cartItems and quantities to create the new structure
+    const updatedItems = cartItems.map((item) => {
+      const key = `${item.id}-${item.color}-${item.size}`;
+      return {
+        product_id: item.id,
+        color: item.color,
+        price: item.price,
+        size: item.size,
+        quantity: quantities[key] || 1,
+      };
+    });
+
+    // Save to local storage
+    localStorage.setItem("UpdatedCartItems", JSON.stringify(updatedItems));
+    nav("/map");
   };
 
   return (
@@ -122,8 +153,11 @@ const Checkout = () => {
           </div>
         );
       })}
-      <button className="mt-4 px-6 py-2 bg-black text-white font-bold rounded-lg shadow hover:bg-gray-800 transition-colors duration-300 ease-in-out">
-        Proseed
+      <button
+        onClick={handleClick}
+        className="mt-4 px-6 py-2 bg-black text-white font-bold rounded-lg shadow hover:bg-gray-800 transition-colors duration-300 ease-in-out"
+      >
+        Proceed
       </button>
     </div>
   );

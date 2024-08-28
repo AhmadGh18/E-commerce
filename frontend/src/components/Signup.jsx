@@ -36,22 +36,37 @@ const Signup = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    try {
-      axiosClient
-        .post("/register", formData)
-        .then((data) => {
-          console.log(data);
-          setUser(data.data.user);
-          setToken(data.data.token);
-        })
-        .catch((error) => {
-          console.log(error.response.data.error);
-          setError(error.response.data.error);
-        });
-    } catch (error) {
-      setError(error);
-    }
+    axiosClient
+      .post("/register", formData)
+      .then((response) => {
+        console.log(response);
+        setUser(response.data.user);
+        setToken(response.data.token);
+      })
+      .catch((error) => {
+        if (error.response) {
+          const errorData = error.response.data;
+          if (errorData.errors) {
+            // Extract validation errors
+            const errorMessages = Object.values(errorData.errors)
+              .flat()
+              .join(" ");
+            setError(errorMessages);
+          } else {
+            // General error message
+            setError(errorData.message || "An error occurred");
+          }
+        } else {
+          // Network or other error
+          setError("Network or server error");
+        }
+        console.error(
+          "Error during registration:",
+          error.response ? error.response.data : error.message
+        );
+      });
   };
+
   const navigate = useNavigate();
   useEffect(() => {
     if (token) {
@@ -71,7 +86,11 @@ const Signup = () => {
             <h2 className="text-gray-800 text-center text-2xl font-bold m-6 md:m-0">
               Log in
             </h2>
-
+            {error && (
+              <div className="mb-4 p-4 bg-red-100 text-red-800 border border-red-300 rounded">
+                <p>{error}</p>
+              </div>
+            )}
             <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
               <div>
                 <div className="relative flex justify-between flex-row w-full gap-2">

@@ -17,6 +17,10 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->integer('quantity');
             $table->decimal('price_at_time', 8, 2);
+            $table->string('color');
+
+            $table->string('size');
+
             $table->timestamps();
         });
     }

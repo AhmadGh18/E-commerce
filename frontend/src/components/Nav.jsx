@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import logo from "../assets/images/event1-1-removebg-preview.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useStateContext } from "../context/ContextProvider";
 
 const Nav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { User, setUser } = useStateContext();
   const toggleMenu = () => setIsOpen(!isOpen);
+  const nav = useNavigate();
   return (
     <div
       className={`z-100 bg-white navbar flex flex-col md:flex-row justify-around items-center h-16 px-8 font-title font-extralight ${
@@ -82,6 +83,7 @@ const Nav = () => {
             <span className="capitalize hidden md:block">{User.name}</span>
           ) : (
             <button
+              onClick={() => nav("/login")}
               className={`bg-black border text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-colors ${
                 isOpen ? "mt-10 mb-10" : ""
               }`}
