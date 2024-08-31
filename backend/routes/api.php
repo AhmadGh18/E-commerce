@@ -24,8 +24,8 @@ Route::post('/createOrder',[OrdersController::class, 'createOrder']);
 Route::get('/orders', [OrdersController::class, 'viewAllOrders']);
 Route::get('/viewAllPayments',[PaymentController::class, 'viewAllPayments']);
 Route::get('/viewSingleOrder/{id}', [OrdersController::class, 'viewSingleOrder']);
-
-
+Route::post('/changeState/{id}', [OrdersController::class, 'changeState']);
+Route::delete('/delete/{id}', [ProductController::class, 'delete']);
 });
 Route::post('/register',[AuthController::class,'register']);
 Route::post('/login',[AuthController::class,'login']);

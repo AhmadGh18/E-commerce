@@ -68,9 +68,6 @@ const AdminMain = () => {
   };
   return (
     <div>
-      <div className="flex justify-start align-top items-start top-0">
-        <TopInfo />
-      </div>
       <ToastContainer />
 
       <div className="flex ml-[300px] flex-col gap-4 mt-6">

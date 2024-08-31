@@ -63,14 +63,27 @@ class ProductController extends Controller
             ], 500);
         }
     }
-    public function UpdateProduct(ProductRequest $req, $id)
+    public function UpdateProduct(Request $req, $id)
     {
         try {
-           
+            $req->validate([
+            "title" => "required|string",
+            "description" => "required|string",
+            "category_id" => "required|integer",
+            "price" => "required|numeric",
+            "tags" => "required|string",
+            "gender" => "required|string",
+            "age" => "required|string",
+            ]);
+
+
+
+
+
+
             $product = Product::findOrFail($id);
 
             if ($req->hasFile('thumbnail')) {
-                // Delete the old thumbnail file from storage if it exists
                 if ($product->thumbnail) {
                     Storage::disk('public')->delete($product->thumbnail);
                 }
@@ -223,7 +236,21 @@ public function getFilteredProducts(Request $request)
         ], 500);
     }
 }
+public function delete(Request $request, $id) {
 
+
+    $product = Product::find($id);
+
+    // Check if the product exists
+    if ($product) {
+        // Delete the product
+        $product->delete();
+
+        return response()->json(['message' => 'Product deleted successfully'], 200);
+    } else {
+        return response()->json(['error' => 'Product not found'], 404);
+    }
+}
 
 
 

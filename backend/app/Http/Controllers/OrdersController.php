@@ -69,6 +69,31 @@ class OrdersController extends Controller
 
         return response()->json(['order' => $order], 200);
     }
+    public function changeState(Request $request, $id)
+{
+    try {
+       
+        $request->validate([
+            'state' => 'required|string|in:done,not done',
+        ]);
+
+        $order = Order::findOrFail($id);
+
+        $order->state = $request->input('state');
+        $order->save();
+
+        // Return a success response
+        return response()->json([
+            'message' => 'Order state updated successfully',
+            'order' => $order
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Failed to update order state',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
 
 

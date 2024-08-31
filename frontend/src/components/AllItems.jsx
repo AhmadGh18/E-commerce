@@ -126,7 +126,7 @@ const AllItems = ({ filters }) => {
   return (
     <div className="relative z-0">
       {/* Container for items */}
-      <div className="flex flex-wrap justify-center gap-6 overflow-auto min-w-full max-w-full p-4">
+      <div className="flex flex-wrap justify-center gap-6 overflow-auto min-w-full max-w-full p-4 overflow-hidden">
         {!isLoading && filteredItems.length > 0 ? (
           filteredItems.map((el) => (
             <motion.div
@@ -144,7 +144,10 @@ const AllItems = ({ filters }) => {
                 boxShadow: "0px 15px 30px rgba(0, 0, 0, 0.2)",
               }}
             >
-              <Link to={`/singleitem/${el.id}`} className="h-full w-full block">
+              <Link
+                to={`/singleProduct/${el.id}`}
+                className="h-full w-full block"
+              >
                 <img
                   src={`http://localhost:8000/storage/${el.thumbnail}`}
                   className="h-full w-full object-cover rounded-t-lg"

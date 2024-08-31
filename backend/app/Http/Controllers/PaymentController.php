@@ -52,7 +52,7 @@ class PaymentController extends Controller
                 'latitude' => $request->latitude,
                 'city' => $request->city,
                 'total_price' => $request->total_price,
-                'state' => 'not done',
+                'state' => 'not set',
             ]);
             foreach ($request->cartItems as $item) {
                 Order_Item::create([

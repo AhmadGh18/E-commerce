@@ -26,20 +26,6 @@ const EditItems = () => {
     fetchItems();
   }, []);
 
-  //   useEffect(() => {
-  //     // Hide the menu if clicking outside of it
-  //     const handleClickOutside = (event) => {
-  //       if (menuRef.current && !menuRef.current.contains(event.target)) {
-  //         setShowMenu(null);
-  //       }
-  //     };
-
-  //     document.addEventListener("mousedown", handleClickOutside);
-  //     return () => {
-  //       document.removeEventListener("mousedown", handleClickOutside);
-  //     };
-  //   }, []);
-
   const handleMenuToggle = (index) => {
     setShowMenu(showMenu === index ? null : index);
   };
@@ -48,9 +34,13 @@ const EditItems = () => {
     navigate(`/adminside/editsingleItem/${id}`); // Correct usage of navigate
   };
 
-  const handleDelete = (id) => {
-    console.log("Delete item with id:", id);
-    // Add your delete functionality here
+  const handleDelete = async (id) => {
+    try {
+      await axiosClient.delete(`/delete/${id}`);
+      setAllItems(allItems.filter((item) => item.id !== id));
+    } catch (error) {
+      console.error("Error deleting item:", error);
+    }
   };
 
   if (loading) return <div>Loading...</div>;

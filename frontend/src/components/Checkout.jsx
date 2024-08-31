@@ -10,7 +10,7 @@ const Checkout = () => {
   const nav = useNavigate();
   useEffect(() => {
     if (!token) {
-      nav("/");
+      nav("/login");
     }
   }, []);
   useEffect(() => {

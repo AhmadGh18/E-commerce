@@ -21,6 +21,19 @@ const SingleOrder = () => {
         setLoading(false);
       });
   }, [id]);
+  const changestate = (newState) => {
+    axiosClient
+      .post(`/changeState/${id}`, { state: newState })
+      .then((response) => {
+        setOrder((prevOrder) => ({
+          ...prevOrder,
+          state: newState,
+        }));
+      })
+      .catch((error) => {
+        console.error("There was an error changing the order state!", error);
+      });
+  };
 
   if (loading)
     return <div className="p-4 max-w-screen-lg mx-auto">Loading...</div>;
@@ -129,14 +142,27 @@ const SingleOrder = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-between mt-6">
-            <button className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-150">
-              Mark as Done
-            </button>
-            <button className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-150">
-              Mark as Not Done
-            </button>
-          </div>
+
+          {order && order.state === "not set" ? (
+            <div className="flex gap-4 mt-4">
+              <button
+                onClick={() => changestate("done")}
+                className="bg-green-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-green-600 transition duration-150"
+              >
+                Mark as Done
+              </button>
+              <button
+                onClick={() => changestate("not done")}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-red-600 transition duration-150"
+              >
+                Mark as Not Done
+              </button>
+            </div>
+          ) : (
+            <div className="mt-4">
+              <strong>Order State:</strong> {order.state}
+            </div>
+          )}
         </div>
       ) : (
         <div className="text-center text-gray-600">
